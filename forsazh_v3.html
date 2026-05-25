@@ -1375,16 +1375,46 @@ function handleSubmit(e, form) {
   e.preventDefault();
   var btn = form.querySelector('button[type="submit"]');
   var orig = btn.textContent;
-  btn.textContent = '✓ Отправлено!';
-  btn.style.background = '#1a7872';
-  btn.style.color = '#fff';
-  setTimeout(function() {
-    btn.textContent = orig;
-    btn.style.background = '';
-    btn.style.color = '';
-    form.reset();
-    closePopup();
-  }, 2500);
+  btn.disabled = true;
+  btn.textContent = 'Отправка…';
+
+  var fd = new FormData(form);
+  fetch('/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: fd.get('Name'), phone: fd.get('Phone') })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(res) {
+    if (res.ok) {
+      btn.textContent = '✓ Заявка отправлена!';
+      btn.style.background = '#1a7872';
+      setTimeout(function() {
+        btn.textContent = orig;
+        btn.style.background = '';
+        btn.disabled = false;
+        form.reset();
+        closePopup();
+      }, 2500);
+    } else {
+      btn.textContent = 'Ошибка. Попробуйте ещё раз.';
+      btn.style.background = '#9b2335';
+      setTimeout(function() {
+        btn.textContent = orig;
+        btn.style.background = '';
+        btn.disabled = false;
+      }, 3000);
+    }
+  })
+  .catch(function() {
+    btn.textContent = 'Нет соединения. Позвоните нам.';
+    btn.style.background = '#9b2335';
+    setTimeout(function() {
+      btn.textContent = orig;
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 3000);
+  });
 }
 
 // ─── СКРОЛЛ: шапка transparent → solid ───
