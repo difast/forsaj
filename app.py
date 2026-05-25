@@ -25,29 +25,23 @@ def submit():
         return jsonify({'ok': False, 'error': 'missing_fields'}), 400
 
     text = (
-        "\U0001f514 *Новая заявка с сайта АК Форсаж*\n\n"
-        f"\U0001f464 *Имя:* {name}\n"
-        f"\U0001f4de *Телефон:* {phone}"
+        "\U0001f514 Новая заявка с сайта АК Форсаж\n\n"
+        f"\U0001f464 Имя: {name}\n"
+        f"\U0001f4de Телефон: {phone}"
     )
 
-    failed = []
     for cid in CHAT_IDS:
         cid = cid.strip()
         if not cid:
             continue
         try:
-            r = requests.post(
+            requests.post(
                 f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage',
-                json={'chat_id': cid, 'text': text, 'parse_mode': 'Markdown'},
-                timeout=10
+                json={'chat_id': cid, 'text': text},
+                timeout=15
             )
-            if not r.ok:
-                failed.append(cid)
         except Exception:
-            failed.append(cid)
-
-    if failed:
-        return jsonify({'ok': False, 'error': 'telegram_error'}), 500
+            pass
 
     return jsonify({'ok': True})
 
