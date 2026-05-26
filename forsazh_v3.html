@@ -462,7 +462,7 @@ h2 em { font-style: italic; color: var(--copper); }
   transition: background .25s;
 }
 .about-cat:hover { background: var(--copper-bg); }
-.about-cat-icon { font-size: 1.4rem; margin-bottom: .6rem; display: block; }
+.about-cat-icon { width: 22px; height: 22px; margin-bottom: .7rem; display: block; color: var(--copper); }
 .about-cat-sub {
   font-size: .68rem;
   font-weight: 500;
@@ -1040,20 +1040,31 @@ footer {
 }
 
 /* ─── CALC POPUP ─── */
+.calc-overlay { perspective: 1400px; }
+.calc-3d {
+  width: 100%;
+  max-width: 500px;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform .12s linear;
+}
 .calc-box {
   background: var(--white);
   border: 1px solid var(--border);
   width: 100%;
-  max-width: 500px;
   position: relative;
   border-radius: 6px;
-  box-shadow: 0 28px 90px rgba(26,26,46,.2);
   overflow: hidden;
-  animation: calcPop .44s cubic-bezier(.34,1.28,.64,1);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,.04),
+    0 8px 20px rgba(0,0,0,.1),
+    0 32px 80px rgba(26,26,46,.18);
+  animation: calcPop .52s cubic-bezier(.34,1.18,.64,1) both;
+  transform-origin: center 30%;
 }
 @keyframes calcPop {
-  from { opacity:0; transform: scale(.88) translateY(32px); }
-  to   { opacity:1; transform: scale(1)   translateY(0); }
+  0%   { opacity:0; transform: perspective(900px) rotateX(-10deg) scale(.93) translateY(18px); }
+  100% { opacity:1; transform: perspective(900px) rotateX(0deg)   scale(1)   translateY(0); }
 }
 .calc-stripe {
   height: 3px;
@@ -1061,19 +1072,27 @@ footer {
 }
 .calc-progress-wrap {
   height: 3px;
-  background: rgba(20,20,42,.08);
+  background: rgba(20,20,42,.07);
+  overflow: hidden;
 }
 .calc-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--copper), var(--teal));
-  transition: width .5s cubic-bezier(.77,0,.175,1);
+  background: linear-gradient(90deg, var(--copper) 0%, var(--copper2) 50%, var(--teal) 100%);
+  background-size: 200% 100%;
+  transition: width .55s cubic-bezier(.77,0,.175,1);
+  box-shadow: 0 0 8px rgba(184,85,32,.5);
+  animation: progShimmer 2.5s linear infinite;
+}
+@keyframes progShimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
 }
 .calc-viewport { overflow: hidden; width: 100%; }
 .calc-track {
   display: flex;
   width: 100%;
   will-change: transform;
-  transition: transform .44s cubic-bezier(.77,0,.175,1);
+  transition: transform .46s cubic-bezier(.77,0,.175,1);
 }
 .calc-panel {
   min-width: 100%;
@@ -1103,40 +1122,51 @@ footer {
 .calc-grid-4 { grid-template-columns: repeat(2, 1fr); }
 .calc-card {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: .35rem;
-  padding: .9rem .5rem;
+  padding: 1.05rem .65rem;
   background: var(--bg);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   color: var(--ink2);
-  font-family: 'DM Sans', sans-serif;
-  font-size: .74rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .95rem;
   font-weight: 400;
   text-align: center;
   line-height: 1.3;
   cursor: pointer;
-  border-radius: 4px;
-  transition: border-color .18s, background .18s, color .18s, transform .15s, box-shadow .18s;
+  border-radius: 3px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: border-color .2s, color .2s, background .2s, transform .22s cubic-bezier(.34,1.3,.64,1), box-shadow .22s;
   -webkit-tap-highlight-color: transparent;
 }
-.calc-icon { font-size: 1.3rem; line-height: 1; display: block; }
-.calc-card:hover {
-  border-color: var(--copper);
-  background: var(--copper-bg);
-  color: var(--ink);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(184,85,32,.13);
+.calc-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--copper), var(--copper2));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .25s ease;
 }
-.calc-card:active { transform: scale(.96); }
+.calc-card:hover::after,
+.calc-card.selected::after { transform: scaleX(1); }
+.calc-card:hover {
+  border-color: rgba(184,85,32,.3);
+  color: var(--ink);
+  background: #faf8f3;
+  transform: translateY(-4px) translateZ(12px);
+  box-shadow: 0 10px 28px rgba(0,0,0,.1), 0 3px 8px rgba(184,85,32,.1);
+}
+.calc-card:active { transform: scale(.96) translateZ(4px); }
 .calc-card.selected {
   border-color: var(--copper);
-  background: var(--copper-bg);
   color: var(--copper);
-  font-weight: 500;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(184,85,32,.13);
+  font-weight: 600;
+  background: var(--copper-bg);
+  transform: translateY(-2px) translateZ(8px);
+  box-shadow: 0 6px 20px rgba(184,85,32,.14);
 }
 .calc-nav {
   display: flex;
@@ -1160,9 +1190,10 @@ footer {
 .calc-back.vis { visibility: visible; }
 .calc-back:hover { color: var(--ink); }
 .calc-next { margin-left: auto; }
-.calc-next:disabled { opacity: .38; cursor: not-allowed; pointer-events: none; }
+.calc-next:disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
 
 @media (max-width: 768px) {
+  .calc-overlay { perspective: none; }
   .calc-panel { padding: 1.8rem 1.5rem 1.2rem; }
   .calc-step-q { font-size: 1.45rem; }
   .calc-grid-6 { grid-template-columns: repeat(2, 1fr); }
@@ -1270,22 +1301,22 @@ footer {
     <br>
     <div class="about-cats">
       <div class="about-cat">
-        <span class="about-cat-icon">⚖️</span>
+        <svg class="about-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
         <div class="about-cat-sub">Направление</div>
         <div class="about-cat-name">Аудиторские услуги</div>
       </div>
       <div class="about-cat">
-        <span class="about-cat-icon">📈</span>
+        <svg class="about-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
         <div class="about-cat-sub">Направление</div>
         <div class="about-cat-name">Консалтинговые услуги</div>
       </div>
       <div class="about-cat">
-        <span class="about-cat-icon">📚</span>
+        <svg class="about-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         <div class="about-cat-sub">Направление</div>
         <div class="about-cat-name">Бухгалтерские услуги</div>
       </div>
       <div class="about-cat">
-        <span class="about-cat-icon">🏗️</span>
+        <svg class="about-cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <div class="about-cat-sub">Направление</div>
         <div class="about-cat-name">Экспертиза</div>
       </div>
@@ -1454,85 +1485,67 @@ footer {
 </div>
 
 <!-- CALC POPUP -->
-<div class="popup-overlay" id="calc-popup" onclick="calcCloseOuter(event)">
-  <div class="calc-box">
-    <div class="calc-stripe"></div>
-    <div class="calc-progress-wrap">
-      <div class="calc-progress-fill" id="calc-fill" style="width:33.33%"></div>
-    </div>
-    <button class="popup-close" onclick="closeCalcPopup()">×</button>
-
-    <div class="calc-viewport">
-      <div class="calc-track" id="calc-track">
-
-        <!-- ШАГ 1: Услуга -->
-        <div class="calc-panel">
-          <div class="calc-step-meta">Шаг 1 из 3</div>
-          <div class="calc-step-q">Какая услуга<br>вас интересует?</div>
-          <div class="calc-grid calc-grid-6">
-            <button class="calc-card" data-field="service" data-val="Аудит" onclick="calcPick(this)">
-              <span class="calc-icon">⚖️</span>Аудит
-            </button>
-            <button class="calc-card" data-field="service" data-val="Налоги" onclick="calcPick(this)">
-              <span class="calc-icon">📊</span>Налоги
-            </button>
-            <button class="calc-card" data-field="service" data-val="Бухгалтерия" onclick="calcPick(this)">
-              <span class="calc-icon">📚</span>Бухгалтерия
-            </button>
-            <button class="calc-card" data-field="service" data-val="Юридические услуги" onclick="calcPick(this)">
-              <span class="calc-icon">🏛️</span>Юр. услуги
-            </button>
-            <button class="calc-card" data-field="service" data-val="Экспертиза" onclick="calcPick(this)">
-              <span class="calc-icon">🔍</span>Экспертиза
-            </button>
-            <button class="calc-card" data-field="service" data-val="Оценка бизнеса" onclick="calcPick(this)">
-              <span class="calc-icon">💼</span>Оценка бизнеса
-            </button>
-          </div>
-        </div>
-
-        <!-- ШАГ 2: Тип организации -->
-        <div class="calc-panel">
-          <div class="calc-step-meta">Шаг 2 из 3</div>
-          <div class="calc-step-q">Тип вашей<br>организации?</div>
-          <div class="calc-grid calc-grid-4">
-            <button class="calc-card" data-field="org" data-val="ООО / АО" onclick="calcPick(this)">
-              <span class="calc-icon">🏢</span>ООО / АО
-            </button>
-            <button class="calc-card" data-field="org" data-val="ИП" onclick="calcPick(this)">
-              <span class="calc-icon">👤</span>ИП
-            </button>
-            <button class="calc-card" data-field="org" data-val="ТСЖ / СНТ / НКО" onclick="calcPick(this)">
-              <span class="calc-icon">🏘️</span>ТСЖ / СНТ
-            </button>
-            <button class="calc-card" data-field="org" data-val="Другое" onclick="calcPick(this)">
-              <span class="calc-icon">✦</span>Другое
-            </button>
-          </div>
-        </div>
-
-        <!-- ШАГ 3: Контакты -->
-        <div class="calc-panel">
-          <div class="calc-step-meta">Шаг 3 из 3</div>
-          <div class="calc-step-q">Оставьте контакты —<br><em>пришлём расчёт</em></div>
-          <form id="calc-form" onsubmit="calcSubmit(event)">
-            <div class="p-field"><input type="text" name="Name" placeholder="Ваше имя" required></div>
-            <div class="p-field"><input type="tel" name="Phone" placeholder="Телефон" required></div>
-            <div class="p-check">
-              <input type="checkbox" id="agree-calc" required>
-              <label for="agree-calc">Согласие на обработку персональных данных согласно ФЗ №152</label>
-            </div>
-            <button type="submit" class="btn-pop-submit" id="calc-submit-btn">Получить расчёт →</button>
-          </form>
-          <p class="popup-legal">Нажимая кнопку, вы соглашаетесь с <a href="http://ak-forsaj.ru/policy">Политикой конфиденциальности</a></p>
-        </div>
-
+<div class="popup-overlay calc-overlay" id="calc-popup" onclick="calcCloseOuter(event)">
+  <div class="calc-3d" id="calc-3d">
+    <div class="calc-box">
+      <div class="calc-stripe"></div>
+      <div class="calc-progress-wrap">
+        <div class="calc-progress-fill" id="calc-fill" style="width:33.33%"></div>
       </div>
-    </div>
+      <button class="popup-close" onclick="closeCalcPopup()">×</button>
 
-    <div class="calc-nav">
-      <button class="calc-back" id="calc-back-btn" onclick="calcBack()">← Назад</button>
-      <button class="btn btn-copper calc-next" id="calc-next-btn" onclick="calcNext()" disabled>Далее →</button>
+      <div class="calc-viewport">
+        <div class="calc-track" id="calc-track">
+
+          <!-- ШАГ 1: Услуга -->
+          <div class="calc-panel">
+            <div class="calc-step-meta">Шаг 1 из 3</div>
+            <div class="calc-step-q">Какая услуга<br>вас интересует?</div>
+            <div class="calc-grid calc-grid-6">
+              <button class="calc-card" data-field="service" data-val="Аудит" onclick="calcPick(this)">Аудит</button>
+              <button class="calc-card" data-field="service" data-val="Налоги" onclick="calcPick(this)">Налоги</button>
+              <button class="calc-card" data-field="service" data-val="Бухгалтерия" onclick="calcPick(this)">Бухгалтерия</button>
+              <button class="calc-card" data-field="service" data-val="Юридические услуги" onclick="calcPick(this)">Юр. услуги</button>
+              <button class="calc-card" data-field="service" data-val="Экспертиза" onclick="calcPick(this)">Экспертиза</button>
+              <button class="calc-card" data-field="service" data-val="Оценка бизнеса" onclick="calcPick(this)">Оценка бизнеса</button>
+            </div>
+          </div>
+
+          <!-- ШАГ 2: Тип организации -->
+          <div class="calc-panel">
+            <div class="calc-step-meta">Шаг 2 из 3</div>
+            <div class="calc-step-q">Тип вашей<br>организации?</div>
+            <div class="calc-grid calc-grid-4">
+              <button class="calc-card" data-field="org" data-val="ООО / АО" onclick="calcPick(this)">ООО / АО</button>
+              <button class="calc-card" data-field="org" data-val="ИП" onclick="calcPick(this)">ИП</button>
+              <button class="calc-card" data-field="org" data-val="ТСЖ / СНТ / НКО" onclick="calcPick(this)">ТСЖ / СНТ</button>
+              <button class="calc-card" data-field="org" data-val="Другое" onclick="calcPick(this)">Другое</button>
+            </div>
+          </div>
+
+          <!-- ШАГ 3: Контакты -->
+          <div class="calc-panel">
+            <div class="calc-step-meta">Шаг 3 из 3</div>
+            <div class="calc-step-q">Оставьте контакты —<br><em>пришлём расчёт</em></div>
+            <form id="calc-form" onsubmit="calcSubmit(event)">
+              <div class="p-field"><input type="text" name="Name" placeholder="Ваше имя" required></div>
+              <div class="p-field"><input type="tel" name="Phone" placeholder="Телефон" required></div>
+              <div class="p-check">
+                <input type="checkbox" id="agree-calc" required>
+                <label for="agree-calc">Согласие на обработку персональных данных согласно ФЗ №152</label>
+              </div>
+              <button type="submit" class="btn-pop-submit" id="calc-submit-btn">Получить расчёт →</button>
+            </form>
+            <p class="popup-legal">Нажимая кнопку, вы соглашаетесь с <a href="http://ak-forsaj.ru/policy">Политикой конфиденциальности</a></p>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="calc-nav">
+        <button class="calc-back" id="calc-back-btn" onclick="calcBack()">← Назад</button>
+        <button class="btn btn-copper calc-next" id="calc-next-btn" onclick="calcNext()" disabled>Далее →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1663,6 +1676,39 @@ document.querySelectorAll('a[href^="#"]').forEach(function(link) {
 
 // ─── CALC POPUP ───
 var calcData = { step: 1, service: '', org: '' };
+var _calcTiltFn = null;
+
+function _attachCalcTilt() {
+  if (window.innerWidth < 768) return;
+  var overlay = $('calc-popup');
+  var tilt    = $('calc-3d');
+  if (!overlay || !tilt) return;
+  _calcTiltFn = function(e) {
+    var rect = tilt.getBoundingClientRect();
+    var dx = (e.clientX - (rect.left + rect.width  / 2)) / (rect.width  / 2);
+    var dy = (e.clientY - (rect.top  + rect.height / 2)) / (rect.height / 2);
+    tilt.style.transform = 'rotateX(' + (dy * -4) + 'deg) rotateY(' + (dx * 5) + 'deg)';
+  };
+  overlay.addEventListener('mousemove', _calcTiltFn);
+  overlay.addEventListener('mouseleave', _resetCalcTilt);
+}
+
+function _detachCalcTilt() {
+  var overlay = $('calc-popup');
+  var tilt    = $('calc-3d');
+  if (overlay && _calcTiltFn) overlay.removeEventListener('mousemove', _calcTiltFn);
+  if (overlay) overlay.removeEventListener('mouseleave', _resetCalcTilt);
+  _calcTiltFn = null;
+  _resetCalcTilt();
+}
+
+function _resetCalcTilt() {
+  var tilt = $('calc-3d');
+  if (!tilt) return;
+  tilt.style.transition = 'transform .55s cubic-bezier(.25,.46,.45,.94)';
+  tilt.style.transform  = 'rotateX(0deg) rotateY(0deg)';
+  setTimeout(function() { if (tilt) tilt.style.transition = 'transform .12s linear'; }, 560);
+}
 
 function openCalcPopup() {
   closeMobileNav();
@@ -1675,9 +1721,11 @@ function openCalcPopup() {
   if (!p) return;
   p.classList.add('active');
   document.body.style.overflow = 'hidden';
+  setTimeout(_attachCalcTilt, 520);
 }
 
 function closeCalcPopup() {
+  _detachCalcTilt();
   var p = $('calc-popup');
   if (!p) return;
   p.classList.remove('active');
