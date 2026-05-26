@@ -1038,6 +1038,140 @@ footer {
   .popup-box { padding: 1.8rem 1.2rem; }
   .hdr-btn { display: none; }
 }
+
+/* ─── CALC POPUP ─── */
+.calc-box {
+  background: var(--white);
+  border: 1px solid var(--border);
+  width: 100%;
+  max-width: 500px;
+  position: relative;
+  border-radius: 6px;
+  box-shadow: 0 28px 90px rgba(26,26,46,.2);
+  overflow: hidden;
+  animation: calcPop .44s cubic-bezier(.34,1.28,.64,1);
+}
+@keyframes calcPop {
+  from { opacity:0; transform: scale(.88) translateY(32px); }
+  to   { opacity:1; transform: scale(1)   translateY(0); }
+}
+.calc-stripe {
+  height: 3px;
+  background: linear-gradient(90deg, var(--copper), var(--teal));
+}
+.calc-progress-wrap {
+  height: 3px;
+  background: rgba(20,20,42,.08);
+}
+.calc-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--copper), var(--teal));
+  transition: width .5s cubic-bezier(.77,0,.175,1);
+}
+.calc-viewport { overflow: hidden; width: 100%; }
+.calc-track {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+  transition: transform .44s cubic-bezier(.77,0,.175,1);
+}
+.calc-panel {
+  min-width: 100%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 2.2rem 2.5rem 1.4rem;
+}
+.calc-step-meta {
+  font-size: .62rem;
+  font-weight: 500;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: .5rem;
+}
+.calc-step-q {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 1.4rem;
+}
+.calc-step-q em { font-style: italic; color: var(--copper); }
+.calc-grid { display: grid; gap: .55rem; }
+.calc-grid-6 { grid-template-columns: repeat(3, 1fr); }
+.calc-grid-4 { grid-template-columns: repeat(2, 1fr); }
+.calc-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  padding: .9rem .5rem;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  color: var(--ink2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .74rem;
+  font-weight: 400;
+  text-align: center;
+  line-height: 1.3;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: border-color .18s, background .18s, color .18s, transform .15s, box-shadow .18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.calc-icon { font-size: 1.3rem; line-height: 1; display: block; }
+.calc-card:hover {
+  border-color: var(--copper);
+  background: var(--copper-bg);
+  color: var(--ink);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(184,85,32,.13);
+}
+.calc-card:active { transform: scale(.96); }
+.calc-card.selected {
+  border-color: var(--copper);
+  background: var(--copper-bg);
+  color: var(--copper);
+  font-weight: 500;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(184,85,32,.13);
+}
+.calc-nav {
+  display: flex;
+  align-items: center;
+  padding: .75rem 2.5rem 1.4rem;
+  border-top: 1px solid var(--border);
+  min-height: 64px;
+}
+.calc-back {
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  color: var(--muted);
+  cursor: pointer;
+  padding: .35rem .5rem;
+  transition: color .2s;
+  -webkit-tap-highlight-color: transparent;
+  visibility: hidden;
+}
+.calc-back.vis { visibility: visible; }
+.calc-back:hover { color: var(--ink); }
+.calc-next { margin-left: auto; }
+.calc-next:disabled { opacity: .38; cursor: not-allowed; pointer-events: none; }
+
+@media (max-width: 768px) {
+  .calc-panel { padding: 1.8rem 1.5rem 1.2rem; }
+  .calc-step-q { font-size: 1.45rem; }
+  .calc-grid-6 { grid-template-columns: repeat(2, 1fr); }
+  .calc-nav { padding: .75rem 1.5rem 1.2rem; }
+}
+@media (max-width: 400px) {
+  .calc-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .calc-step-q { font-size: 1.25rem; }
+}
 </style>
 </head>
 <body>
@@ -1166,7 +1300,7 @@ footer {
       <div class="s-label">Что мы делаем</div>
       <h2>Услуги</h2>
     </div>
-    <button class="btn btn-teal" onclick="openPopup()">Получить расчёт</button>
+    <button class="btn btn-teal" onclick="openCalcPopup()">Получить расчёт</button>
   </div>
   <div class="services-grid">
     <div class="srv"><span class="srv-n">01</span><div class="srv-name">Арбитраж</div><div class="srv-arrow">↗</div></div>
@@ -1319,6 +1453,90 @@ footer {
   </div>
 </div>
 
+<!-- CALC POPUP -->
+<div class="popup-overlay" id="calc-popup" onclick="calcCloseOuter(event)">
+  <div class="calc-box">
+    <div class="calc-stripe"></div>
+    <div class="calc-progress-wrap">
+      <div class="calc-progress-fill" id="calc-fill" style="width:33.33%"></div>
+    </div>
+    <button class="popup-close" onclick="closeCalcPopup()">×</button>
+
+    <div class="calc-viewport">
+      <div class="calc-track" id="calc-track">
+
+        <!-- ШАГ 1: Услуга -->
+        <div class="calc-panel">
+          <div class="calc-step-meta">Шаг 1 из 3</div>
+          <div class="calc-step-q">Какая услуга<br>вас интересует?</div>
+          <div class="calc-grid calc-grid-6">
+            <button class="calc-card" data-field="service" data-val="Аудит" onclick="calcPick(this)">
+              <span class="calc-icon">⚖️</span>Аудит
+            </button>
+            <button class="calc-card" data-field="service" data-val="Налоги" onclick="calcPick(this)">
+              <span class="calc-icon">📊</span>Налоги
+            </button>
+            <button class="calc-card" data-field="service" data-val="Бухгалтерия" onclick="calcPick(this)">
+              <span class="calc-icon">📚</span>Бухгалтерия
+            </button>
+            <button class="calc-card" data-field="service" data-val="Юридические услуги" onclick="calcPick(this)">
+              <span class="calc-icon">🏛️</span>Юр. услуги
+            </button>
+            <button class="calc-card" data-field="service" data-val="Экспертиза" onclick="calcPick(this)">
+              <span class="calc-icon">🔍</span>Экспертиза
+            </button>
+            <button class="calc-card" data-field="service" data-val="Оценка бизнеса" onclick="calcPick(this)">
+              <span class="calc-icon">💼</span>Оценка бизнеса
+            </button>
+          </div>
+        </div>
+
+        <!-- ШАГ 2: Тип организации -->
+        <div class="calc-panel">
+          <div class="calc-step-meta">Шаг 2 из 3</div>
+          <div class="calc-step-q">Тип вашей<br>организации?</div>
+          <div class="calc-grid calc-grid-4">
+            <button class="calc-card" data-field="org" data-val="ООО / АО" onclick="calcPick(this)">
+              <span class="calc-icon">🏢</span>ООО / АО
+            </button>
+            <button class="calc-card" data-field="org" data-val="ИП" onclick="calcPick(this)">
+              <span class="calc-icon">👤</span>ИП
+            </button>
+            <button class="calc-card" data-field="org" data-val="ТСЖ / СНТ / НКО" onclick="calcPick(this)">
+              <span class="calc-icon">🏘️</span>ТСЖ / СНТ
+            </button>
+            <button class="calc-card" data-field="org" data-val="Другое" onclick="calcPick(this)">
+              <span class="calc-icon">✦</span>Другое
+            </button>
+          </div>
+        </div>
+
+        <!-- ШАГ 3: Контакты -->
+        <div class="calc-panel">
+          <div class="calc-step-meta">Шаг 3 из 3</div>
+          <div class="calc-step-q">Оставьте контакты —<br><em>пришлём расчёт</em></div>
+          <form id="calc-form" onsubmit="calcSubmit(event)">
+            <div class="p-field"><input type="text" name="Name" placeholder="Ваше имя" required></div>
+            <div class="p-field"><input type="tel" name="Phone" placeholder="Телефон" required></div>
+            <div class="p-check">
+              <input type="checkbox" id="agree-calc" required>
+              <label for="agree-calc">Согласие на обработку персональных данных согласно ФЗ №152</label>
+            </div>
+            <button type="submit" class="btn-pop-submit" id="calc-submit-btn">Получить расчёт →</button>
+          </form>
+          <p class="popup-legal">Нажимая кнопку, вы соглашаетесь с <a href="http://ak-forsaj.ru/policy">Политикой конфиденциальности</a></p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="calc-nav">
+      <button class="calc-back" id="calc-back-btn" onclick="calcBack()">← Назад</button>
+      <button class="btn btn-copper calc-next" id="calc-next-btn" onclick="calcNext()" disabled>Далее →</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── УТИЛИТЫ ───
 function $(id) { return document.getElementById(id); }
@@ -1367,7 +1585,7 @@ function closeOuter(e) {
 }
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closePopup();
+  if (e.key === 'Escape') { closePopup(); closeCalcPopup(); }
 });
 
 // ─── ФОРМА ───
@@ -1442,6 +1660,120 @@ document.querySelectorAll('a[href^="#"]').forEach(function(link) {
     }
   });
 });
+
+// ─── CALC POPUP ───
+var calcData = { step: 1, service: '', org: '' };
+
+function openCalcPopup() {
+  closeMobileNav();
+  calcData = { step: 1, service: '', org: '' };
+  document.querySelectorAll('.calc-card').forEach(function(c) { c.classList.remove('selected'); });
+  var f = document.getElementById('calc-form');
+  if (f) f.reset();
+  _calcRender(false);
+  var p = $('calc-popup');
+  if (!p) return;
+  p.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCalcPopup() {
+  var p = $('calc-popup');
+  if (!p) return;
+  p.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function calcCloseOuter(e) {
+  if (e.target === $('calc-popup')) closeCalcPopup();
+}
+
+function calcPick(btn) {
+  var field = btn.dataset.field;
+  document.querySelectorAll('.calc-card[data-field="' + field + '"]').forEach(function(c) {
+    c.classList.remove('selected');
+  });
+  btn.classList.add('selected');
+  calcData[field] = btn.dataset.val;
+  _calcRender(true);
+  if (calcData.step < 3) {
+    setTimeout(calcNext, 380);
+  }
+}
+
+function calcNext() {
+  if (calcData.step >= 3) return;
+  calcData.step++;
+  _calcRender(true);
+}
+
+function calcBack() {
+  if (calcData.step <= 1) return;
+  calcData.step--;
+  _calcRender(true);
+}
+
+function _calcRender(animate) {
+  var step  = calcData.step;
+  var track = $('calc-track');
+  var fill  = $('calc-fill');
+  var back  = $('calc-back-btn');
+  var next  = $('calc-next-btn');
+
+  if (!animate) {
+    track.style.transition = 'none';
+    requestAnimationFrame(function() { track.style.transition = ''; });
+  }
+  track.style.transform = 'translateX(-' + ((step - 1) * 100) + '%)';
+  fill.style.width = Math.round(step / 3 * 100) + '%';
+  back.classList.toggle('vis', step > 1);
+
+  if (step === 3) {
+    next.style.display = 'none';
+  } else {
+    next.style.display = '';
+    var key = step === 1 ? 'service' : 'org';
+    next.disabled = !calcData[key];
+  }
+}
+
+function calcSubmit(e) {
+  e.preventDefault();
+  var btn = $('calc-submit-btn');
+  var orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Отправка…';
+
+  var fd = new FormData(e.target);
+  fetch('/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: fd.get('Name'), phone: fd.get('Phone'),
+      service: calcData.service, org: calcData.org
+    })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function() {
+    btn.textContent = '✓ Заявка принята!';
+    btn.style.background = '#1a7872';
+    setTimeout(function() {
+      closeCalcPopup();
+      btn.textContent = orig;
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 2500);
+  })
+  .catch(function() {
+    btn.textContent = 'Нет соединения. Позвоните нам.';
+    btn.style.background = '#9b2335';
+    setTimeout(function() {
+      btn.textContent = orig;
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 3000);
+  });
+}
 
 // ─── CANVAS: PLASMA WAVE ───
 // Запускаем только после полной загрузки страницы

@@ -21,14 +21,20 @@ def submit():
     name  = str(data.get('name',  '')).strip()
     phone = str(data.get('phone', '')).strip()
 
+    service = str(data.get('service', '')).strip()
+    org     = str(data.get('org',     '')).strip()
+
     if not name or not phone:
         return jsonify({'ok': False, 'error': 'missing_fields'}), 400
 
-    text = (
-        "\U0001f514 Новая заявка с сайта АК Форсаж\n\n"
-        f"\U0001f464 Имя: {name}\n"
-        f"\U0001f4de Телефон: {phone}"
-    )
+    lines = ["\U0001f514 Новая заявка с сайта АК Форсаж", ""]
+    lines.append(f"\U0001f464 Имя: {name}")
+    lines.append(f"\U0001f4de Телефон: {phone}")
+    if service:
+        lines.append(f"\U0001f4cb Услуга: {service}")
+    if org:
+        lines.append(f"\U0001f3e2 Организация: {org}")
+    text = "\n".join(lines)
 
     for cid in CHAT_IDS:
         cid = cid.strip()
